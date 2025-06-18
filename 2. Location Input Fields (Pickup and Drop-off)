@@ -1,0 +1,33 @@
+<div class="vehicle-options" role="radiogroup" aria-label="Select vehicle type">
+  <div class="vehicle-option selected" tabindex="0" role="radio" aria-checked="true" data-vehicle="car">
+    <span class="material-icons" aria-hidden="true">directions_car</span>
+    Car
+  </div>
+  <div class="vehicle-option" tabindex="0" role="radio" aria-checked="false" data-vehicle="motorcycle">
+    <span class="material-icons" aria-hidden="true">two_wheeler</span>
+    Motorcycle
+  </div>
+</div>
+
+<script>
+  const vehicleOptions = document.querySelectorAll('.vehicle-option');
+  let selectedVehicle = 'car'; // default
+
+  vehicleOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      vehicleOptions.forEach(o => {
+        o.classList.remove('selected');
+        o.setAttribute('aria-checked', 'false');
+      });
+      option.classList.add('selected');
+      option.setAttribute('aria-checked', 'true');
+      selectedVehicle = option.dataset.vehicle;
+    });
+    option.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        option.click();
+      }
+    });
+  });
+</script>
