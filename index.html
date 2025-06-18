@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grab-like Car & Motorcycle Booking Platform</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    /* Reset and base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #222;
+      overflow: hidden;
+    }
+    /* Root variables */
+    :root {
+      --primary: #db2777; /* pink */
+      --primary-dark: #99154b;
+      --background-light: #fefefe;
+      --background-muted: #fafafa;
+      --text-primary: #222;
+      --text-muted: #666;
+      --border-radius: 12px;
+      --shadow: 0 4px 8px rgba(0,0,0,0.1);
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 48px;
+    }
+    /* Layout grid for desktop */
+    .app-container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      grid-template-rows: 60px 1fr 80px;
+      grid-template-areas:
+        "header header"
+        "sidebar main"
+        "footer footer";
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Header */
+    header.app-header {
+      grid-area: header;
+      background: linear-gradient(135deg, var(--primary), #d6336c);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--spacing-lg);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 24px;
+      letter-spacing: 2px;
+      user-select: none;
+      font-family: 'Poppins', sans-serif;
+      cursor: default;
+    }
+    /* Search input */
+    .header-search {
+      position: relative;
+      flex: 1;
+      max-width: 480px;
+      margin: 0 var(--spacing-md);
+    }
+    input#search-location {
+      width: 100%;
+      padding: 12px 48px 12px 16px;
+      border-radius: 30px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      outline-offset: 4px;
+    }
+    input#search-location:focus {
+      outline: 3px solid rgba(255 0 100 / 0.5);
+    }
+    .material-icons.search-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      color: var(--primary);
+      pointer-events: none;
+      user-select: none;
+    }
+    /* Profile button */
+    .profile-btn {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      gap: var(--spacing-sm);
+    }
+    .profile-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #6f42c1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .profile-avatar .material-icons {
+      color: white;
+      font-size: 24px;
+    }
+    .profile-name {
+      font-weight: 600;
+      color: white;
+      user-select: none;
+    }
+    /* Sidebar */
+    aside.sidebar {
+      grid-area: sidebar;
+      background: var(--background-muted);
+      border-right: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      padding: var(--spacing-lg);
+      overflow-y: auto;
+    }
+    nav.sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+    nav.sidebar-nav button.nav-btn {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--primary-dark);
+      border: none;
+      background: transparent;
+      text-align: left;
+      padding: 12px 16px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+    nav.sidebar-nav button.nav-btn.active,
+    nav.sidebar-nav button.nav-btn:hover {
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+    nav.sidebar-nav button.nav-btn .material-icons {
+      font-size: 24px;
+      color: inherit;
+      flex-shrink: 0;
+    }
+    /* Main content */
+    main.main-content {
+      grid-area: main;
+      padding: var(--spacing-lg);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+      background: var(--background-light);
+    }
+    /* Booking form */
+    .booking-form {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow);
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+    .booking-form h2 {
+      font-size: 1.8rem;
+      color: var(--primary-dark);
+      font-weight: 700;
+      margin-bottom: var(--spacing-md);
+      text-align: center;
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      display: block;
+      color: var(--primary-dark);
+      user-select: none;
+    }
+    input[type=text], input[type=datetime-local], select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: var(--border-radius);
+      border: 1px solid #ddd;
+      font-size: 16px;
+      font-weight: 600;
+      outline-offset: 2px;
+      transition: border-color 0.3s;
+    }
+    input[type=text]:focus,
+    input[type=datetime-local]:focus,
+    select:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+    .vehicle-options {
+      display: flex;
+      gap: var(--spacing-md);
+      justify-content: center;
+      margin-bottom: var(--spacing-md);
+    }
+    .vehicle-option {
+      flex: 1;
+      cursor: pointer;
+      border: 2px solid transparent;
+      border-radius: var(--border-radius);
+      padding: var(--spacing-md);
+      text-align: center;
+      background: #fafafa;
+      transition: border-color 0.3s, background-color 0.3s;
+      user-select: none;
+    }
+    .vehicle-option.selected {
+      border-color: var(--primary);
+      background: #ffe3f1;
+      box-shadow: 0 8px 16px rgba(219,39,119,0.2);
+    }
+    .vehicle-option .material-icons {
+      font-size: 48px;
+      color: var(--primary-dark);
+      margin-bottom: var(--spacing-sm);
+    }
+    button.book-now-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 26px;
+      font-weight: 700;
+      font-size: 18px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(219,39,119,0.5);
+      transition: background-color 0.3s ease;
+      align-self: center;
+      width: 200px;
+    }
+    button.book-now-btn:disabled {
+      background: #ddb0cc;
+      cursor: default;
+      box-shadow: none;
+    }
+    button.book-now-btn:hover:not(:disabled) {
+      background: var(--primary-dark);
+    }
+    /* Booking confirmation */
+    .booking-confirmation {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #e9f5f3;
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow);
+      display: none;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      border-left: 6px solid #2e856e;
+    }
+    .booking-confirmation h3 {
+      color: #2e856e;
+      font-weight: 700;
+    }
+    /* Booking history */
+    .booking-history {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .history-header {
+      font-weight: 700;
+      font-size: 1.7rem;
+      color: var(--primary-dark);
+      margin-bottom: var(--spacing-lg);
+      text-align: center;
+    }
+    .history-list {
+      overflow-x: auto;
+    }
+    table.history-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 12px;
+    }
+    table.history-table th, table.history-table td {
+      padding: 12px 14px;
+      text-align: left;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    table.history-table thead th {
+      font-weight: 600;
+      color: var(--primary-dark);
+      border-bottom: 2px solid var(--primary);
+      background: #fff;
+    }
+    table.history-table tbody tr {
+      background: #fafafa;
+      box-shadow: var(--shadow);
+      border-radius: var(--border-radius);
+    }
+    .status-completed {
+      color: #198754;
+      font-weight: 700;
+    }
+    .status-cancelled {
+      color: #dc3545;
+      font-weight: 700;
+    }
+    .status-pending {
+      color: #ffc107;
+      font-weight: 700;
+    }
+    /* Profile section */
+    .profile-section {
+      max-width: 480px;
+      margin: 0 auto;
+      background: white;
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      text-align: center;
+    }
+    .profile-section h2 {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 1.8rem;
+      margin-bottom: var(--spacing-md);
+    }
+    .profile-avatar-large {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto;
+      background: var(--primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .profile-avatar-large .material-icons {
+      font-size: 80px;
+      color: white;
+    }
+    .profile-name-big {
+      font-weight: 700;
+      font-size: 24px;
+      margin-top: var(--spacing-sm);
+      color: var(--primary-dark);
+      user-select: none;
+    }
+    .profile-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-xl);
+      margin-top: var(--spacing-lg);
+      text-align: center;
+    }
+    .profile-stat {
+      font-weight: 600;
+      color: var(--primary-dark);
+      user-select: none;
+    }
+    .profile-stat span.number {
+      display: block;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .app-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px 1fr 80px;
+        grid-template-areas:
+          "header"
+          "main"
+          "footer";
+      }
+      aside.sidebar {
+        display: none;
+      }
+      main.main-content {
+        padding: var(--spacing-md);
+        overflow-y: auto;
+      }
+    }
+    /* Footer placeholder */
+    footer.app-footer {
+      grid-area: footer;
+      background: #f8f9fa;
+      height: 80px;
+      box-shadow: inset 0 1px 0 #ddd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #888;
+      font-size: 14px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container" role="application">
+    <header class="app-header" role="banner" aria-label="Application header">
+      <div class="logo" aria-live="polite" aria-atomic="true">Grab-like Booking</div>
+      <div class="header-search">
+        <input id="search-location" type="text" placeholder="Search pickup or drop-off location" aria-label="Search pickup or drop-off location" autocomplete="off" />
+        <span class="material-icons search-icon" aria-hidden="true">search</span>
+      </div>
+      <button class="profile-btn" aria-label="User Profile" title="User Profile">
+        <div class="profile-avatar" aria-hidden="true">
+          <span class="material-icons">person</span>
+        </div>
+        <span class="profile-name" id="profile-name">Traveler</span>
+      </button>
+    </header>
+    <aside class="sidebar" role="navigation" aria-label="Primary navigation">
+      <nav class="sidebar-nav" role="menubar">
+        <button class="nav-btn active" role="menuitem" aria-current="page" id="nav-booking-btn" aria-controls="main-booking-section" tabindex="0">
+          <span class="material-icons" aria-hidden="true">directions_car</span>
+          Book Ride
+        </button>
+        <button class="nav-btn" role="menuitem" id="nav-history-btn" aria-controls="main-history-section" tabindex="-1">
+          <span class="material-icons" aria-hidden="true">history</span>
+          Booking History
+        </button>
+        <button class="nav-btn" role="menuitem" id="nav-profile-btn" aria-controls="main-profile-section" tabindex="-1">
+          <span class="material-icons" aria-hidden="true">account_circle</span>
+          Profile
+        </button>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <!-- Booking Form -->
+      <section id="main-booking-section" tabindex="0" role="region" aria-label="Ride booking form">
+        <form class="booking-form" id="booking-form" novalidate>
+          <h2>Book a Ride</h2>
+          <div>
+            <label>Choose Vehicle Type</label>
+            <div class="vehicle-options" role="radiogroup" aria-label="Select vehicle type">
+              <div class="vehicle-option selected" tabindex="0" role="radio" aria-checked="true" data-vehicle="car">
+                <span class="material-icons" aria-hidden="true">directions_car</span>
+                Car
+              </div>
+              <div class="vehicle-option" tabindex="0" role="radio" aria-checked="false" data-vehicle="motorcycle">
+                <span class="material-icons" aria-hidden="true">two_wheeler</span>
+                Motorcycle
+              </div>
+            </div>
+          </div>
+          <div>
+            <label for="pickup-location">Pickup Location</label>
+            <input type="text" id="pickup-location" name="pickup-location" placeholder="Enter pickup point" autocomplete="off" required aria-required="true" />
+          </div>
+          <div>
+            <label for="dropoff-location">Drop-off Location</label>
+            <input type="text" id="dropoff-location" name="dropoff-location" placeholder="Enter destination" autocomplete="off" required aria-required="true" />
+          </div>
+          <div>
+            <label for="pickup-datetime">Pickup Date & Time</label>
+            <input type="datetime-local" id="pickup-datetime" name="pickup-datetime" required aria-required="true" />
+          </div>
+          <button type="submit" class="book-now-btn" disabled id="book-ride-btn" aria-disabled="true">Book Now</button>
+        </form>
+        <div class="booking-confirmation" id="booking-confirmation" role="alert" aria-live="assertive" aria-atomic="true">
+          <h3>Booking Confirmed!</h3>
+          <p id="booking-summary-text"></p>
+        </div>
+      </section>
+      <!-- Booking History -->
+      <section id="main-history-section" role="region" aria-label="Booking history" hidden>
+        <h2 class="history-header">Booking History</h2>
+        <div class="history-list">
+          <table class="history-table" aria-describedby="history-desc">
+            <thead>
+              <tr>
+                <th scope="col">Booking ID</th>
+                <th scope="col">Vehicle</th>
+                <th scope="col">Pickup</th>
+                <th scope="col">Drop-off</th>
+                <th scope="col">Date & Time</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody">
+              <!-- Rows generated by JS -->
+            </tbody>
+          </table>
+          <p id="history-desc" class="sr-only">List of all your past bookings with details and status.</p>
+        </div>
+      </section>
+      <!-- Profile -->
+      <section id="main-profile-section" role="region" aria-label="User profile" hidden>
+        <div class="profile-section">
+          <div class="profile-avatar-large" aria-hidden="true">
+            <span class="material-icons">person</span>
+          </div>
+          <div class="profile-name-big" id="profile-main-name">Traveler</div>
+          <div class="profile-stats" aria-label="User travel statistics">
+            <div class="profile-stat" tabindex="0">
+              <span class="number" id="stat-rides-count">0</span>
+              Rides Booked
+            </div>
+            <div class="profile-stat" tabindex="0">
+              <span class="number" id="stat-total-spent">$0</span>
+              Total Spent
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="app-footer" role="contentinfo">
+      &copy; 2024 Grab-like Booking Platform. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    const vehicleOptions = document.querySelectorAll('.vehicle-option');
+    const bookRideBtn = document.getElementById('book-ride-btn');
+    const bookingForm = document.getElementById('booking-form');
+    const bookingConfirmation = document.getElementById('booking-confirmation');
+    const bookingSummaryText = document.getElementById('booking-summary-text');
+    const historySection = document.getElementById('main-history-section');
+    const bookingSection = document.getElementById('main-booking-section');
+    const profileSection = document.getElementById('main-profile-section');
+    const historyTbody = document.getElementById('history-tbody');
+    const navBookingBtn = document.getElementById('nav-booking-btn');
+    const navHistoryBtn = document.getElementById('nav-history-btn');
+    const navProfileBtn = document.getElementById('nav-profile-btn');
+    const profileNameDisplay = document.getElementById('profile-name');
+    const profileMainName = document.getElementById('profile-main-name');
+    const statRidesCount = document.getElementById('stat-rides-count');
+    const statTotalSpent = document.getElementById('stat-total-spent');
+
+    let selectedVehicle = 'car';
+    // Booking history data stored in localStorage
+    let bookingHistory = JSON.parse(localStorage.getItem('bookingHistory')) || [];
+
+    // Update UI active tab and visibility
+    function setActiveTab(tab) {
+      // Reset all buttons
+      [navBookingBtn, navHistoryBtn, navProfileBtn].forEach(btn => {
+        btn.classList.remove('active');
+        btn.tabIndex = -1;
+        btn.setAttribute('aria-current', 'false');
+      });
+      // Hide all sections
+      [bookingSection, historySection, profileSection].forEach(sec => {
+        sec.hidden = true;
+      });
+      if(tab === 'booking') {
+        navBookingBtn.classList.add('active');
+        navBookingBtn.tabIndex = 0;
+        navBookingBtn.setAttribute('aria-current', 'page');
+        bookingSection.hidden = false;
+      } else if(tab === 'history') {
+        navHistoryBtn.classList.add('active');
+        navHistoryBtn.tabIndex = 0;
+        navHistoryBtn.setAttribute('aria-current', 'page');
+        historySection.hidden = false;
+        renderBookingHistory();
+      } else if(tab === 'profile') {
+        navProfileBtn.classList.add('active');
+        navProfileBtn.tabIndex = 0;
+        navProfileBtn.setAttribute('aria-current', 'page');
+        profileSection.hidden = false;
+        updateProfileStats();
+      }
+    }
+    navBookingBtn.addEventListener('click', () => setActiveTab('booking'));
+    navHistoryBtn.addEventListener('click', () => setActiveTab('history'));
+    navProfileBtn.addEventListener('click', () => setActiveTab('profile'));
+
+    // Vehicle select function
+    vehicleOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        vehicleOptions.forEach(o => {
+          o.classList.remove('selected');
+          o.setAttribute('aria-checked', 'false');
+          o.tabIndex = 0;
+        });
+        opt.classList.add('selected');
+        opt.setAttribute('aria-checked', 'true');
+        selectedVehicle = opt.dataset.vehicle;
+        validateForm();
+      });
+      // Keyboard support for vehicle option
+      opt.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          opt.click();
+        }
+      });
+    });
+
+    // Form inputs
+    const pickupInput = document.getElementById('pickup-location');
+    const dropoffInput = document.getElementById('dropoff-location');
+    const datetimeInput = document.getElementById('pickup-datetime');
+
+    // Enable/disable Book Now button based on form validation
+    function validateForm() {
+      const valid = pickupInput.value.trim() !== '' &&
+                    dropoffInput.value.trim() !== '' &&
+                    datetimeInput.value.trim() !== '';
+      bookRideBtn.disabled = !valid;
+      bookRideBtn.setAttribute('aria-disabled', (!valid).toString());
+      return valid;
+    }
+    pickupInput.addEventListener('input', validateForm);
+    dropoffInput.addEventListener('input', validateForm);
+    datetimeInput.addEventListener('input', validateForm);
+
+    // Handle booking submission
+    bookingForm.addEventListener('submit', e => {
+      e.preventDefault();
+      if(!validateForm()) return;
+      // Collect booking data
+      const bookingId = 'BKG-' + Math.floor(Math.random() * 900000 + 100000);
+      const booking = {
+        id: bookingId,
+        vehicle: selectedVehicle,
+        pickup: pickupInput.value.trim(),
+        dropoff: dropoffInput.value.trim(),
+        datetime: datetimeInput.value,
+        status: 'Pending',
+        timestamp: new Date().toISOString()
+      };
+      bookingHistory.unshift(booking);
+      localStorage.setItem('bookingHistory', JSON.stringify(bookingHistory));
+      // Show confirmation
+      bookingSummaryText.textContent = `Your ${booking.vehicle} ride from "${booking.pickup}" to "${booking.dropoff}" is confirmed for ${new Date(booking.datetime).toLocaleString()}. Booking ID: ${booking.id}`;
+      bookingConfirmation.style.display = 'flex';
+      // Reset form
+      bookingForm.reset();
+      selectedVehicle = 'car';
+      vehicleOptions.forEach(o => {
+        o.classList.remove('selected');
+        o.setAttribute('aria-checked', 'false');
+      });
+      vehicleOptions[0].classList.add('selected');
+      vehicleOptions[0].setAttribute('aria-checked', 'true');
+      bookRideBtn.disabled = true;
+      bookRideBtn.setAttribute('aria-disabled', 'true');
+      // Refresh booking history if open
+      if(!historySection.hidden) {
+        renderBookingHistory();
+      }
+      setActiveTab('history');
+    });
+
+    // Render booking history table
+    function renderBookingHistory() {
+      historyTbody.innerHTML = '';
+      if(bookingHistory.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 6;
+        td.style.textAlign = 'center';
+        td.textContent = 'No bookings yet.';
+        tr.appendChild(td);
+        historyTbody.appendChild(tr);
+        return;
+      }
+      bookingHistory.forEach(b => {
+        const tr = document.createElement('tr');
+        const idTd = document.createElement('td');
+        idTd.textContent = b.id;
+        const vehicleTd = document.createElement('td');
+        vehicleTd.textContent = b.vehicle.charAt(0).toUpperCase() + b.vehicle.slice(1);
+        const pickupTd = document.createElement('td');
+        pickupTd.textContent = b.pickup;
+        const dropoffTd = document.createElement('td');
+        dropoffTd.textContent = b.dropoff;
+        const datetimeTd = document.createElement('td');
+        datetimeTd.textContent = new Date(b.datetime).toLocaleString();
+        const statusTd = document.createElement('td');
+        statusTd.textContent = b.status;
+        statusTd.className = 'status-' + b.status.toLowerCase();
+        tr.append(idTd, vehicleTd, pickupTd, dropoffTd, datetimeTd, statusTd);
+        historyTbody.appendChild(tr);
+      });
+    }
+
+    // Update profile name display and stats
+    function updateProfileStats() {
+      const name = 'Traveler';
+      profileNameDisplay.textContent = name;
+      profileMainName.textContent = name;
+      statRidesCount.textContent = bookingHistory.length.toString();
+      // Estimate total spent: assume $10 for motorcycle rides and $25 for cars as example
+      const totalSpent = bookingHistory.reduce((acc,b) => {
+        if(b.status === 'Completed') {
+          return acc + (b.vehicle === 'motorcycle' ? 10 : 25);
+        }
+        return acc;
+      }, 0);
+      statTotalSpent.textContent = '$' + totalSpent.toFixed(2);
+    }
+
+    // Initial setup on page load
+    setActiveTab('booking');
+    updateProfileStats();
+
+  </script>
+</body>
+</html>
+
