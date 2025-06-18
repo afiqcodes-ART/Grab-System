@@ -1,0 +1,4 @@
+<div>
+  <label for="pickup-datetime">Pickup Date & Time</label>
+  <input type="datetime-local" id="pickup-datetime" name="pickup-datetime" required />
+</div>
