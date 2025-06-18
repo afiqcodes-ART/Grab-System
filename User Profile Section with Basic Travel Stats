@@ -1,0 +1,37 @@
+<section aria-label="User profile" id="profile-section" style="max-width:300px; margin: auto;">
+  <div style="text-align:center;">
+    <div style="width:100px; height:100px; margin: 0 auto; background:#db2777; border-radius:50%; color:#fff; font-size:60px; display:flex; align-items:center; justify-content:center;">
+      <span class="material-icons">person</span>
+    </div>
+    <h2 id="profile-name" style="color:#99154b;">Traveler</h2>
+  </div>
+  <div style="display:flex; justify-content:space-around; margin-top:20px; font-weight:600; color:#db2777;">
+    <div>
+      <div id="rides-count" style="font-size:24px;">0</div>
+      Rides Booked
+    </div>
+    <div>
+      <div id="total-spent" style="font-size:24px;">$0</div>
+      Total Spent
+    </div>
+  </div>
+</section>
+
+<script>
+  function updateProfileStats() {
+    let bookingHistory = JSON.parse(localStorage.getItem('bookingHistory')) || [];
+    const ridesCount = bookingHistory.length;
+    // Example total spent: $25 per car ride, $10 per motorcycle ride, count only Completed rides here or all as demonstration
+    let totalSpent = 0;
+    bookingHistory.forEach(b => {
+      if(b.status === 'Completed') {
+        totalSpent += b.vehicle === 'motorcycle' ? 10 : 25;
+      }
+    });
+    document.getElementById('rides-count').textContent = ridesCount.toString();
+    document.getElementById('total-spent').textContent = '$' + totalSpent.toFixed(2);
+  }
+
+  // Call after page load or new booking
+  updateProfileStats();
+</script>
