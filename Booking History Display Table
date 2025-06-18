@@ -1,0 +1,52 @@
+<section aria-label="Booking history">
+  <h2>Booking History</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Booking ID</th>
+        <th>Vehicle</th>
+        <th>Pickup</th>
+        <th>Drop-off</th>
+        <th>Date & Time</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="history-tbody">
+      <!-- Bookings will be dynamically inserted here -->
+    </tbody>
+  </table>
+</section>
+
+<script>
+  const historyTbody = document.getElementById('history-tbody');
+
+  function renderBookingHistory() {
+    let bookingHistory = JSON.parse(localStorage.getItem('bookingHistory')) || [];
+    historyTbody.innerHTML = '';
+    if (bookingHistory.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 6;
+      td.style.textAlign = 'center';
+      td.textContent = 'No bookings yet.';
+      tr.appendChild(td);
+      historyTbody.appendChild(tr);
+      return;
+    }
+    bookingHistory.forEach(b => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${b.id}</td>
+        <td>${b.vehicle.charAt(0).toUpperCase() + b.vehicle.slice(1)}</td>
+        <td>${b.pickup}</td>
+        <td>${b.dropoff}</td>
+        <td>${new Date(b.datetime).toLocaleString()}</td>
+        <td>${b.status}</td>
+      `;
+      historyTbody.appendChild(tr);
+    });
+  }
+
+  // Call once on page load or when switching to history view
+  renderBookingHistory();
+</script>
