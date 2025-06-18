@@ -1,0 +1,65 @@
+<form id="booking-form" novalidate>
+  <!-- Vehicle Selection (Use snippet #1 here) -->
+  <!-- Location Inputs (Use snippet #2 here) -->
+  <!-- Date & Time Picker (Use snippet #3 here) -->
+
+  <button type="submit" id="book-ride-btn" disabled>Book Now</button>
+</form>
+
+<div id="confirmation" role="alert" aria-live="assertive" style="display:none; color:green; margin-top:1rem;"></div>
+
+<script>
+  const bookingForm = document.getElementById('booking-form');
+  const bookRideBtn = document.getElementById('book-ride-btn');
+  const pickupInput = document.getElementById('pickup-location');
+  const dropoffInput = document.getElementById('dropoff-location');
+  const datetimeInput = document.getElementById('pickup-datetime');
+  const confirmationEl = document.getElementById('confirmation');
+
+  // Enable button only when all inputs are filled
+  function validateForm() {
+    return pickupInput.value.trim() !== '' &&
+      dropoffInput.value.trim() !== '' &&
+      datetimeInput.value.trim() !== '';
+  }
+  function toggleBookButton() {
+    bookRideBtn.disabled = !validateForm();
+  }
+  pickupInput.addEventListener('input', toggleBookButton);
+  dropoffInput.addEventListener('input', toggleBookButton);
+  datetimeInput.addEventListener('input', toggleBookButton);
+
+  // We'll use selectedVehicle from the vehicle selection snippet event handler
+  let selectedVehicle = 'car';  // default value, update according to vehicle selection
+
+  bookingForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if(!validateForm()) return alert('Please fill all required fields.');
+
+    const bookingId = 'BKG-' + Math.floor(Math.random() * 900000 + 100000);
+    const booking = {
+      id: bookingId,
+      vehicle: selectedVehicle,
+      pickup: pickupInput.value.trim(),
+      dropoff: dropoffInput.value.trim(),
+      datetime: datetimeInput.value,
+      status: 'Pending'
+    };
+
+    // Save booking to localStorage
+    let bookingHistory = JSON.parse(localStorage.getItem('bookingHistory')) || [];
+    bookingHistory.unshift(booking);
+    localStorage.setItem('bookingHistory', JSON.stringify(bookingHistory));
+
+    // Show confirmation message
+    confirmationEl.style.display = 'block';
+    confirmationEl.textContent = `Your ${booking.vehicle} ride from "${booking.pickup}" to "${booking.dropoff}" is confirmed for ${new Date(booking.datetime).toLocaleString()}. Booking ID: ${booking.id}`;
+
+    // Reset form
+    bookingForm.reset();
+    bookRideBtn.disabled = true;
+
+    // Reset vehicle selection UI as needed to default
+    // (Implement based on your vehicle selection code)
+  });
+</script>
